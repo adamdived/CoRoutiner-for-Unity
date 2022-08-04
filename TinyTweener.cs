@@ -1,5 +1,5 @@
 /* 
- * CoRoutiner Class
+ * TinyTweener Class
  * (C)2022 Marco Capelli
  * 
  * I wrote this class because i needed something like iTween or DOTween
