@@ -1,5 +1,5 @@
 /* 
- * TinyTweener Class
+ * CoRoutiner Class
  * (C)2022 Marco Capelli
  * 
  * I wrote this class because i needed something like iTween or DOTween
@@ -20,6 +20,7 @@ namespace LodaleSolution
         public AnimationCurve _curve;
         private IEnumerator _moveTo;
 
+        #region MoveTo()
         /// <summary>
         /// Call this method to move a transform to a given target position and rotation.
         /// Pass the value of the Transform you want to control, the vectors and quaternions
@@ -66,5 +67,7 @@ namespace LodaleSolution
              * floating point differences due to timing above */
             _transform.SetPositionAndRotation(_moveToPos, _moveToRot);
         }
+
+        #endregion
     }
 }
