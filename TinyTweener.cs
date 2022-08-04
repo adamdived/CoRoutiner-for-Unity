@@ -1,5 +1,5 @@
 /* 
- * CoRoutiner Class
+ * TinyTweener Class
  * (C)2022 Marco Capelli
  * 
  * I wrote this class because i needed something like iTween or DOTween
@@ -15,7 +15,7 @@ using UnityEngine;
 namespace LodaleSolution
 {
 
-    public class CoRoutiner : MonoBehaviour
+    public class TinyTweener : MonoBehaviour
     {
         public AnimationCurve _curve;
         private IEnumerator _moveTo;
