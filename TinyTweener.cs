@@ -4,7 +4,7 @@
  * 
  * I wrote this class because i needed something like iTween or DOTween
  * but without installing any external library for my project.
- * TinyTweener it's a quick and fast general utility to move objects and
+ * TinyTweener it's a quick and fast general utility to move objects
  * change values with very precise transitions. It also offer many 
  * options of use for different conditions.
  *
@@ -15,6 +15,7 @@
  * ColorTo()
  * LightColorTo()
  * LightIntensityTo()
+ * AudioFadeTo()
  * 
  */
 
@@ -34,6 +35,7 @@ namespace LS.TinyTweener
         private IEnumerator _colorTo;
         private IEnumerator _lightColorTo;
         private IEnumerator _lightIntensityTo;
+        private IEnumerator _audioFadeTo;
         
         #endregion
 
@@ -217,6 +219,40 @@ namespace LS.TinyTweener
             }
 
             _light.intensity = _intensity;
+        }
+
+        #endregion
+
+        #region AudioVolumeTo()
+
+        /// <summary>
+        /// Call this method to change the volume of an audio source over time from one value to another.
+        /// example: AudioVolumeTo(_audioSourceGameObject, _desiredVolumeValue, 10);
+        /// </summary>
+        public void AudioFadeTo(GameObject _audioGO, float _volume, float duration)
+        {
+            Cancel(_audioFadeTo);
+            _audioFadeTo = AudioFadeToCoroutine(_audioGO, _volume, duration);
+            StartCoroutine(_audioFadeTo);
+        }
+
+        private IEnumerator AudioFadeToCoroutine(GameObject _audioGO, float _volume, float duration)
+        {
+            float startTime = Time.time;
+
+            AudioSource _audioSource = _audioGO.GetComponent<AudioSource>();
+            float startVolume = _audioSource.volume;
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                _audioSource.volume = Mathf.Lerp(startVolume, _volume, t);
+
+                yield return null;
+            }
+
+            _audioSource.volume = _volume;
         }
 
         #endregion
