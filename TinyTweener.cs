@@ -3,9 +3,9 @@
  * (C)2022 Marco Capelli
  * 
  * I wrote this class because i needed something like iTween or DOTween
- * but i didn't want to install any external library for my project.
- * CoRoutiner is quick and faster, especially if you need precise value
- * transitioning, and offer many options of use for different conditions.
+ * but without installing any external library for my project.
+ * TinyTweener is quick and fast, especially if you need precise value
+ * transitioning. It also offer many options of use for different conditions.
  * 
  */
 
@@ -17,8 +17,13 @@ namespace LodaleSolution
 
     public class TinyTweener : MonoBehaviour
     {
+        #region Parameters
+
         public AnimationCurve _curve;
         private IEnumerator _moveTo;
+        private IEnumerator _rotateTo;
+        
+        #endregion
 
         #region MoveTo()
         /// <summary>
@@ -31,18 +36,11 @@ namespace LodaleSolution
         public void MoveTo(Transform _transform, Vector3 _moveToPos, Quaternion _moveToRot, float duration)
         {
             Cancel(_moveTo);
-            _moveTo = SnapToCoroutine(_transform, _moveToPos, _moveToRot, duration);
+            _moveTo = MoveToCoroutine(_transform, _moveToPos, _moveToRot, duration);
             StartCoroutine(_moveTo);
         }
 
-        /* This makes sure we don't create multiple coroutines that fight for the current
-         * transform.position and rotation. Only one instance of the coroutine runs. */
-        public void Cancel(IEnumerator _coroutine)
-        {
-            if (_coroutine != null) StopCoroutine(_coroutine);
-        }
-
-        private IEnumerator SnapToCoroutine(Transform _transform, Vector3 _moveToPos, Quaternion _moveToRot, float duration)
+        private IEnumerator MoveToCoroutine(Transform _transform, Vector3 _moveToPos, Quaternion _moveToRot, float duration)
         {
             // Store the start time and position of the given transform. Required for the linear interpolation.
             float startTime = Time.time;
@@ -69,5 +67,47 @@ namespace LodaleSolution
         }
 
         #endregion
+
+        #region RotateTo()
+
+        /// <summary>
+        /// Call this method to rotate a transform to a given target rotation.
+        /// Pass the value of the Transform you want to control and the quaternions
+        /// of the target rotation, and finally the duration time you need to perform the action.
+        /// 
+        /// example: RotateTo(this.transform, _target.transform.position, _target.transform.rotation, 10);
+        /// </summary>
+
+        public void RotateTo(Transform _transform, Quaternion _rotateToRot, float duration)
+        {
+            Cancel(_rotateTo);
+            _rotateTo = RotateToCoroutine(_transform, _rotateToRot, duration);
+            StartCoroutine(_rotateTo);
+        }
+
+        private IEnumerator RotateToCoroutine(Transform _transform, Quaternion _rotateToRot, float duration)
+        {
+            float startTime = Time.time;
+            Vector3 startPos = _transform.position;
+            Quaternion startRot = _transform.rotation;
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                _transform.SetPositionAndRotation(Vector3.Lerp(startPos, startPos, t), Quaternion.Lerp(startRot, _rotateToRot, t));
+
+                yield return null;
+            }
+
+            _transform.SetPositionAndRotation(startPos, _rotateToRot);
+        }
+
+        #endregion
+
+        public void Cancel(IEnumerator _coroutine)
+        {
+            if (_coroutine != null) StopCoroutine(_coroutine);
+        }
     }
 }
