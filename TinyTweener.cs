@@ -6,13 +6,18 @@
  * but without installing any external library for my project.
  * TinyTweener is quick and fast, especially if you need precise value
  * transitioning. It also offer many options of use for different conditions.
+ *
+ * Added functions:
+ * MoveTo()
+ * RotateTo()
+ * ColorTo()
  * 
  */
 
 using System.Collections;
 using UnityEngine;
 
-namespace LodaleSolution
+namespace LS.TinyTweener
 {
 
     public class TinyTweener : MonoBehaviour
@@ -22,6 +27,7 @@ namespace LodaleSolution
         public AnimationCurve _curve;
         private IEnumerator _moveTo;
         private IEnumerator _rotateTo;
+        private IEnumerator _colorTo;
         
         #endregion
 
@@ -99,12 +105,45 @@ namespace LodaleSolution
 
                 yield return null;
             }
-
             _transform.SetPositionAndRotation(startPos, _rotateToRot);
         }
 
         #endregion
 
+        #region ColorTo()
+        /// <summary>
+        /// Call this method to change a color over time from one to another.
+        /// example: ColorTo(_color, _materialGameObject, _shaderColorParameterName, 10);
+        /// </summary>
+
+        public void ColorTo(Color32 _color, GameObject _materialGO, string _shaderColorParameterName, float duration)
+        {
+            Cancel(_colorTo);
+            _colorTo = ColorToCoroutine(_color, _materialGO, _shaderColorParameterName, duration);
+            StartCoroutine(_colorTo);
+        }
+
+        private IEnumerator ColorToCoroutine(Color32 _color, GameObject _materialGO, string _shaderColorParameterName, float duration)
+        {
+            float startTime = Time.time;
+
+            Material _material = _materialGO.GetComponent<Renderer>().material;
+            Color startColor = _material.GetColor(_shaderColorParameterName);
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                _material.color = Color.Lerp(startColor, _color, t);
+
+                yield return null;
+            }
+        }
+
+        #endregion
+
+        /* This makes sure we don't create multiple coroutines that fight for the current
+         * transform.position and rotation. Only one instance of the coroutine runs. */
         public void Cancel(IEnumerator _coroutine)
         {
             if (_coroutine != null) StopCoroutine(_coroutine);
