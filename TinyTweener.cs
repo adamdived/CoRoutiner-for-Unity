@@ -11,6 +11,8 @@
  * MoveTo()
  * RotateTo()
  * ColorTo()
+ * LightColorTo()
+ * LightIntensityTo()
  * 
  */
 
@@ -28,6 +30,8 @@ namespace LS.TinyTweener
         private IEnumerator _moveTo;
         private IEnumerator _rotateTo;
         private IEnumerator _colorTo;
+        private IEnumerator _lightColorTo;
+        private IEnumerator _lightIntensityTo;
         
         #endregion
 
@@ -105,6 +109,7 @@ namespace LS.TinyTweener
 
                 yield return null;
             }
+
             _transform.SetPositionAndRotation(startPos, _rotateToRot);
         }
 
@@ -116,14 +121,14 @@ namespace LS.TinyTweener
         /// example: ColorTo(_color, _materialGameObject, _shaderColorParameterName, 10);
         /// </summary>
 
-        public void ColorTo(Color32 _color, GameObject _materialGO, string _shaderColorParameterName, float duration)
+        public void ColorTo(Color _color, GameObject _materialGO, string _shaderColorParameterName, float duration)
         {
             Cancel(_colorTo);
             _colorTo = ColorToCoroutine(_color, _materialGO, _shaderColorParameterName, duration);
             StartCoroutine(_colorTo);
         }
 
-        private IEnumerator ColorToCoroutine(Color32 _color, GameObject _materialGO, string _shaderColorParameterName, float duration)
+        private IEnumerator ColorToCoroutine(Color _color, GameObject _materialGO, string _shaderColorParameterName, float duration)
         {
             float startTime = Time.time;
 
@@ -138,6 +143,76 @@ namespace LS.TinyTweener
 
                 yield return null;
             }
+
+            _material.color = _color;
+        }
+
+        #endregion
+
+        #region LightColorTo()
+
+        /// <summary>
+        /// Call this method to change the light color over time from one to another.
+        /// example: LightColorTo(_color, _lightGameObject, 10);
+        /// </summary>
+        public void LightColorTo(Color _color, GameObject _lightGO, float duration)
+        {
+            Cancel(_lightColorTo);
+            _lightColorTo = LightColorToCoroutine(_color, _lightGO, duration);
+            StartCoroutine(_lightColorTo);
+        }
+
+        private IEnumerator LightColorToCoroutine (Color _color, GameObject _lightGO, float duration)
+        {
+            float startTime = Time.time;
+
+            Light _light = _lightGO.GetComponent<Light>();
+            Color startColor = _light.color;
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                _light.color = Color.Lerp(startColor, _color, t);
+
+                yield return null;
+            }
+
+            _light.color = _color;
+        }
+
+        #endregion
+
+        #region LightIntensityTo()
+
+        /// <summary>
+        /// Call this method to change the light intensity over time from one value to another.
+        /// example: LightIntensityTo(_intensityFloat, _lightGameObject, 10);
+        /// </summary>
+        public void LightIntensityTo(float _intensity, GameObject _lightGO, float duration)
+        {
+            Cancel(_lightIntensityTo);
+            _lightIntensityTo = LightIntensityToCoroutine(_intensity, _lightGO, duration);
+            StartCoroutine(_lightIntensityTo);
+        }
+
+        private IEnumerator LightIntensityToCoroutine(float _intensity, GameObject _lightGO, float duration)
+        {
+            float startTime = Time.time;
+
+            Light _light = _lightGO.GetComponent<Light>();
+            float startIntensity = _light.intensity;
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                _light.intensity = Mathf.Lerp(startIntensity, _intensity, t);
+
+                yield return null;
+            }
+
+            _light.intensity = _intensity;
         }
 
         #endregion
