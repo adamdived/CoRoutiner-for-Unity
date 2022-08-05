@@ -4,10 +4,12 @@
  * 
  * I wrote this class because i needed something like iTween or DOTween
  * but without installing any external library for my project.
- * TinyTweener is quick and fast, especially if you need precise value
- * transitioning. It also offer many options of use for different conditions.
+ * TinyTweener it's a quick and fast general utility to move objects
+ * change values with very precise transitions. It also offer many 
+ * options of use for different conditions.
  *
- * Added functions:
+ * Features:
+ * 
  * MoveTo()
  * RotateTo()
  * ColorTo()
@@ -36,6 +38,7 @@ namespace LS.TinyTweener
         #endregion
 
         #region MoveTo()
+
         /// <summary>
         /// Call this method to move a transform to a given target position and rotation.
         /// Pass the value of the Transform you want to control, the vectors and quaternions
@@ -116,6 +119,7 @@ namespace LS.TinyTweener
         #endregion
 
         #region ColorTo()
+
         /// <summary>
         /// Call this method to change a color over time from one to another.
         /// example: ColorTo(_color, _materialGameObject, _shaderColorParameterName, 10);
