@@ -6,5 +6,5 @@ change values with very precise transitions. It also offer many options
 of use for different conditions.
 # Example of usage. Call the function fron any script.
 ```
-MoveTo(this.transform, _target.transform.position, _target.transform.rotation, 10);
+MoveTo(this.transform, _target.transform.position, _target.transform.rotation, 10f);
 ```
