@@ -1,6 +1,6 @@
 /* 
  * TinyTweener Class
- * (C)2022 Marco Capelli
+ * (C)2022-2023 Marco Capelli
  * 
  * I wrote this class because i needed something like iTween or DOTween
  * but without installing any external library for my project.
@@ -16,13 +16,15 @@
  * LightColorTo()
  * LightIntensityTo()
  * AudioFadeTo()
- * 
+ * ImageFillAmount()
+ * ImageFade()
  */
 
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
-namespace LS.TinyTweener
+namespace LS
 {
 
     public class TinyTweener : MonoBehaviour
@@ -36,7 +38,9 @@ namespace LS.TinyTweener
         private IEnumerator _lightColorTo;
         private IEnumerator _lightIntensityTo;
         private IEnumerator _audioFadeTo;
-        
+	    private IEnumerator _imageToFill;
+	    private IEnumerator _imageFade;
+
         #endregion
 
         #region MoveTo()
@@ -168,7 +172,7 @@ namespace LS.TinyTweener
             StartCoroutine(_lightColorTo);
         }
 
-        private IEnumerator LightColorToCoroutine (Color _color, GameObject _lightGO, float duration)
+        private IEnumerator LightColorToCoroutine(Color _color, GameObject _lightGO, float duration)
         {
             float startTime = Time.time;
 
@@ -229,15 +233,15 @@ namespace LS.TinyTweener
         /// Call this method to change the volume of an audio source over time from one value to another.
         /// example: AudioVolumeTo(_audioSourceGameObject, _desiredVolumeValue, 10);
         /// </summary>
-        public void AudioFadeTo(GameObject _audioGO, float _volume, float duration)
+	    public void AudioFadeTo(GameObject _audioGO, float _volume, float duration)
         {
             Cancel(_audioFadeTo);
-            _audioFadeTo = AudioFadeToCoroutine(_audioGO, _volume, duration);
+	        _audioFadeTo = AudioFadeToCoroutine(_audioGO, _volume, duration);
             StartCoroutine(_audioFadeTo);
         }
 
-        private IEnumerator AudioFadeToCoroutine(GameObject _audioGO, float _volume, float duration)
-        {
+	    private IEnumerator AudioFadeToCoroutine(GameObject _audioGO, float _volume, float duration)
+	    {
             float startTime = Time.time;
 
             AudioSource _audioSource = _audioGO.GetComponent<AudioSource>();
@@ -256,6 +260,80 @@ namespace LS.TinyTweener
         }
 
         #endregion
+
+        #region ImageFillAmount()
+
+        public void ImageToFill(GameObject imageGO, float value, float duration)
+        {
+            Cancel(_imageToFill);
+            _imageToFill = FillImageCoroutine(imageGO, value, duration);
+            StartCoroutine(_imageToFill);
+        }
+
+        private IEnumerator FillImageCoroutine(GameObject imageGO, float value, float duration)
+        {
+
+            float startTime = Time.time;
+
+            Image image = imageGO.GetComponent<Image>();
+            float startValue = image.fillAmount;
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                image.fillAmount = Mathf.Lerp(startValue, value, t);
+
+                yield return null;
+            }
+
+            image.fillAmount = value;
+
+        }
+
+        #endregion
+        
+        #region ImageFade()
+
+	    /// <summary>
+	    /// Call this method to change the volume of an audio source over time from one value to another.
+	    /// example: AudioVolumeTo(_audioSourceGameObject, _desiredVolumeValue, 10);
+	    /// </summary>
+	    public void ImageFadeTo(GameObject _imageGO, float _targetFade, float duration, float delay)
+	    {
+		    Cancel(_imageFade);
+		    _imageFade = ImageFadeToCoroutine(_imageGO, _targetFade, duration, delay);
+		    StartCoroutine(_imageFade);
+	    }
+
+	    private IEnumerator ImageFadeToCoroutine(GameObject _imageGO, float _targetFade, float duration, float delay)
+	    {
+	    	yield return new WaitForSeconds(delay);
+	    	
+		    float startTime = Time.time;
+
+		    Image _image = _imageGO.GetComponent<Image>();
+		    float initialAlpha = _image.color.a;
+
+		    while (Time.time - startTime < duration)
+		    {
+			    float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+			    float newAlpha = Mathf.Lerp(initialAlpha, _targetFade, t);
+			    
+			    Color newColor = new Color (_image.color.r, _image.color.g, _image.color.b, newAlpha);
+			    
+			    _image.color = newColor;
+
+			    yield return null;
+		    }
+		    
+		    Color finalAlpha = new Color (_image.color.r, _image.color.g, _image.color.b, _targetFade);
+		    _image.color = finalAlpha;
+	    }
+
+        #endregion
+
 
         /* This makes sure we don't create multiple coroutines that fight for the current
          * transform.position and rotation. Only one instance of the coroutine runs. */
