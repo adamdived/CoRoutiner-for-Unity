@@ -3,7 +3,7 @@ I wrote this class because i needed something like iTween or DOTween
 but without installing any external library for my project. I call it
 "one class for everything". Well not "everything" but you get the point.
 TinyTweener it's a quick and fast general utility to move objects and
-change values with zero floating points errors. It also offer many options
+change values with zero floating point errors. It also offer many options
 of use for different conditions.
 
 # MoveTo()
