@@ -33,7 +33,7 @@ to black when players try to sneak through the walls.
 
 # Example of usage.
 
-Attach it to a GameObject and call the function fron any script.
+Attach it to a GameObject, reference it and call the function fron any script.
 ```
 MoveTo(this.transform, _target.transform.position, _target.transform.rotation, 10f);
 ```
