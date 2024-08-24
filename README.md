@@ -12,6 +12,9 @@ Move a transform from Vector3 postion A to Vector3 position B, and rotate forwar
 # RotateTo()
 Rotate a transform from a Quaternion A to a Quaternion B.
 
+# ScaleTo()
+Locally scale a transform.
+
 # ColorTo()
 Transition colors.
 
