@@ -1,17 +1,13 @@
 /* 
  * TinyTweener Class
- * (C)2022-2023 Marco Capelli
+ * 2022-2024 Marco Capelli
+ * https://github.com/adamdived/TinyTweener-for-Unity
  * 
- * I wrote this class because i needed something like iTween or DOTween
- * but without installing any external library for my project.
- * TinyTweener it's a quick and fast general utility to move objects
- * change values with very precise transitions. It also offer many 
- * options of use for different conditions.
- *
  * Features:
  * 
  * MoveTo()
  * RotateTo()
+ * ScaleTO()
  * ColorTo()
  * LightColorTo()
  * LightIntensityTo()
@@ -34,6 +30,7 @@ namespace LS
         public AnimationCurve _curve;
         private IEnumerator _moveTo;
         private IEnumerator _rotateTo;
+        private IEnumerator _scaleTo;
         private IEnumerator _colorTo;
         private IEnumerator _lightColorTo;
         private IEnumerator _lightIntensityTo;
@@ -120,6 +117,43 @@ namespace LS
             }
 
             _transform.SetPositionAndRotation(startPos, _rotateToRot);
+        }
+
+        #endregion
+
+        #region ScaleTO()
+
+        /// <summary>
+        /// Call this method to scale a transform to a given target scale.
+        /// Pass the value of the Transform you want to control and the value
+        /// of the target scale, and finally the duration time you need to perform the action.
+        /// 
+        /// example: ScaleTo(transform, new Vector3(2f, 2f, 2f), 1.0f);
+        /// </summary>
+
+        public void ScaleTo(Transform _transform, Vector3 _scaleToScale, float duration)
+        {
+            Cancel(_scaleTo);
+            _scaleTo = ScaleToCoroutine(_transform, _scaleToScale, duration);
+            StartCoroutine(_scaleTo);
+        }
+
+        private IEnumerator ScaleToCoroutine(Transform _transform, Vector3 _scaleToScale, float duration)
+        {
+            float startTime = Time.time;
+            Vector3 startScale = _transform.localScale;
+
+            while (Time.time - startTime < duration)
+            {
+                float t = _curve.Evaluate((Time.time - startTime) / duration);
+
+                _transform.localScale = Vector3.Lerp(startScale, _scaleToScale, _curve.Evaluate(t));
+
+                yield return null;
+            }
+
+            // Apply the final scale
+            _transform.localScale = _scaleToScale;
         }
 
         #endregion
